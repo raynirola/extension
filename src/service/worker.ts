@@ -1,4 +1,4 @@
-import { User } from '@interface/user.interface'
+import type { User } from '@interface/user'
 import trpc from '@src/lib/trpc/sever'
 import { TRPCError } from '@trpc/server'
 import { createChromeHandler } from 'trpc-chrome/adapter'
