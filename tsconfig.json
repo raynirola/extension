@@ -22,6 +22,7 @@
       "@config/*": ["src/config/*"],
       "@content/*": ["src/content/*"],
       "@interface/*": ["src/interface/*"],
+      "@lib/*": ["src/lib/*"],
       "@popup/*": ["src/popup/*"],
       "@service/*": ["src/service/*"],
       "@shared/*": ["src/shared/*"],

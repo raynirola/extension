@@ -13,6 +13,7 @@ export default defineConfig({
       "@config": path.resolve(__dirname, "src", "config"),
       "@content": path.resolve(__dirname, "src", "content"),
       "@interface": path.resolve(__dirname, "src", "interface"),
+      "@lib": path.resolve(__dirname, "src", "lib"),
       "@popup": path.resolve(__dirname, "src", "popup"),
       "@service": path.resolve(__dirname, "src", "service"),
       "@shared": path.resolve(__dirname, "src", "shared"),
