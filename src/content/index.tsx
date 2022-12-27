@@ -1,26 +1,32 @@
 import type { FC } from 'react'
+import { chromeLink } from 'trpc-chrome/link'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 /**
  * Local imports
  */
+import App from '@content/app'
 import initializeDOM from '@utils/dom'
+import trpc from '@lib/trpc/client'
+
+const port = chrome.runtime.connect()
+const queryClient = new QueryClient({})
+const trpcClient = trpc.createClient({ links: [chromeLink({ port })] })
 
 /**
- * App Component
- * Entry point for the content script
+ * Root Component
  */
-const App: FC = () => {
+const Root: FC = () => {
   return (
-    <div className="fixed top-2 right-2 z-max rounded bg-white px-6 py-3 font-sans shadow-subtle ring-1 ring-brand/10">
-      <h1 className="font-semibold text-gray-700">Content Script</h1>
-      <code className="mt-1 block">
-        <pre className="text-xs text-gray-500">Hello World!</pre>
-      </code>
-    </div>
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </trpc.Provider>
   )
 }
 
 /**
- * Render the App component
+ * Render the Root component
  */
-;(async () => await initializeDOM(<App />))()
+;(async () => await initializeDOM(<Root />))()
