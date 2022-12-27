@@ -1,15 +1,20 @@
-import React from 'react'
+import type{ FC } from 'react'
+import trpc from '@src/lib/trpc/client'
 
-import MessageComponent from '@content/components/message'
-
-const ContentScriptApp = () => {
+/**
+ * App Component
+ * Entry point for the content script
+ */
+const App: FC = () => {
+  const { data } = trpc.greeting.useQuery(undefined, { initialData: { message: 'Loading...' } })
   return (
-    <div className="fixed top-4 right-4 z-max max-w-xs shadow-md shadow-purple-400/20">
-      <div className="rounded-md bg-white font-sans shadow-subtle ring-1 ring-purple-300">
-        <MessageComponent />
-      </div>
+    <div className="fixed top-2 right-2 z-max rounded bg-white px-6 py-3 font-sans shadow-subtle ring-1 ring-brand/10">
+      <h1 className="font-semibold text-gray-700">Content Script</h1>
+      <code className="mt-1 block">
+        <pre className="text-xs text-gray-500">{data?.message}</pre>
+      </code>
     </div>
   )
 }
 
-export default ContentScriptApp
+export default App
