@@ -1,4 +1,4 @@
-import '@src/styles/app.css'
+import 'tailwindcss/tailwind.css'
 import type { FC } from 'react'
 import { createRoot } from 'react-dom/client'
 import { chromeLink } from 'trpc-chrome/link'

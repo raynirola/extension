@@ -23,7 +23,13 @@ const appRouter = trpc.router({
     try {
       await delay(3000)
       const res = await fetch('https://jsonplaceholder.typicode.com/users/1')
-      return (await res.json()) as User
+      const data: User = await res.json()
+
+      return {
+        id: data.id,
+        name: data.name,
+        username: data.username
+      }
     } catch {
       throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
     }
