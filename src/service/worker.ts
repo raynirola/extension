@@ -7,7 +7,7 @@ const appRouter = trpc.router({
   greeting: trpc.procedure.query(async () => ({ message: 'Hello World 🎉' })),
   user: trpc.procedure.query(async () => {
     try {
-      const random = Math.floor(Math.random() * 100) + 1
+      const random = Math.floor(Math.random() * 10) + 1
       const res = await fetch(`https://jsonplaceholder.typicode.com/users/${random}`)
       const data: User = await res.json()
 
