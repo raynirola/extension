@@ -7,7 +7,7 @@ interface ExtendedStorageChange<T> extends chrome.storage.StorageChange {
   oldValue: T[keyof T]
 }
 
-class ExtendedStorage<T extends Record<string, any>> {
+export class ExtendedStorage<T extends Record<string, any>> {
   constructor(private area: chrome.storage.AreaName) {}
 
   get(key: keyof T): Observable<T[keyof T]> {
@@ -52,11 +52,7 @@ class ExtendedStorage<T extends Record<string, any>> {
       chrome.storage.onChanged.addListener((changes, areaName) => {
         if (areaName === this.area) {
           Object.entries(changes).forEach(([key, change]) => {
-            observer.next({
-              key,
-              newValue: change.newValue,
-              oldValue: change.oldValue
-            })
+            observer.next({ key, newValue: change.newValue, oldValue: change.oldValue })
           })
         }
       })
@@ -66,13 +62,12 @@ class ExtendedStorage<T extends Record<string, any>> {
 
 interface Store {
   foo: string
-  bar: number
-  baz: boolean
+  user: { name: string; age: number; email?: string }
 }
 
 export const storage = new ExtendedStorage<Store>('sync')
 
-const useStorage = <K extends keyof Store>(key: K) => {
+export const useStorage = <K extends keyof Store>(key: K) => {
   const [value, setState] = React.useState<Store[K] | undefined>()
 
   React.useEffect(() => {
@@ -91,5 +86,3 @@ const useStorage = <K extends keyof Store>(key: K) => {
 
   return { value, set } as const
 }
-
-export default useStorage
