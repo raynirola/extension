@@ -8,47 +8,10 @@ interface ExtendedStorageChange<T> extends chrome.storage.StorageChange {
 }
 
 export class ExtendedStorage<T extends Record<string, any>> {
-  constructor(private area: chrome.storage.AreaName) {}
+  private changes$?: Observable<ExtendedStorageChange<T>>
 
-  get(key: keyof T): Observable<T[keyof T]> {
-    return new Observable(observer => {
-      chrome.storage[this.area].get([key], items => {
-        observer.next((items as unknown as T)[key])
-        observer.complete()
-      })
-    })
-  }
-
-  set(key: keyof T, value: T[keyof T]): Observable<void> {
-    const items = { [key]: value } as Record<keyof T, T[keyof T]>
-    return new Observable(observer => {
-      chrome.storage[this.area].set(items, () => {
-        observer.next()
-        observer.complete()
-      })
-    })
-  }
-
-  remove(key: keyof T): Observable<void> {
-    return new Observable(observer => {
-      chrome.storage[this.area].remove(key as string, () => {
-        observer.next()
-        observer.complete()
-      })
-    })
-  }
-
-  clear(): Observable<void> {
-    return new Observable(observer => {
-      chrome.storage[this.area].clear(() => {
-        observer.next()
-        observer.complete()
-      })
-    })
-  }
-
-  changes<C extends Record<string, any>>(): Observable<ExtendedStorageChange<C>> {
-    return new Observable(observer => {
+  constructor(private area: chrome.storage.AreaName) {
+    this.changes$ = new Observable(observer => {
       chrome.storage.onChanged.addListener((changes, areaName) => {
         if (areaName === this.area) {
           Object.entries(changes).forEach(([key, change]) => {
@@ -58,31 +21,50 @@ export class ExtendedStorage<T extends Record<string, any>> {
       })
     })
   }
+
+  get(key: keyof T): Observable<T[keyof T]> {
+    return new Observable(observer => {
+      chrome.storage[this.area].get([key], items => {
+        observer.next((items as unknown as T)[key])
+      })
+
+      this.changes$?.subscribe(change => {
+        if (change.key === key) observer.next(change.newValue as unknown as T[keyof T])
+      })
+    })
+  }
+
+  set(key: keyof T, value: T[keyof T]): void {
+    const items = { [key]: value } as Record<keyof T, T[keyof T]>
+    chrome.storage[this.area].set(items)
+  }
+
+  remove(key: keyof T): void {
+    chrome.storage[this.area].remove(key as string | string[])
+  }
+
+  clear(): void {
+    chrome.storage[this.area].clear()
+  }
 }
 
-interface Store {
-  foo: string
-  user: { name: string; age: number; email?: string }
+export interface Store {
+  user?: { id: number; name: string; username: string; email: string }
 }
 
 export const storage = new ExtendedStorage<Store>('sync')
 
 export const useStorage = <K extends keyof Store>(key: K) => {
-  const [value, setState] = React.useState<Store[K] | undefined>()
+  const [value, setState] = React.useState<Store[K]>()
 
   React.useEffect(() => {
-    const subscription = storage.get(key).subscribe(val => setState(val as Store[K] | undefined))
+    const subscription = storage.get(key).subscribe(val => setState(val as Store[K]))
     return () => subscription.unsubscribe()
   }, [key])
 
-  React.useEffect(() => {
-    const subscription = storage.changes<Store>().subscribe(change => {
-      if (change.key === key) setState(change.newValue as unknown as Store[K])
-    })
-    return () => subscription.unsubscribe()
-  }, [])
+  const set = (value: Store[K]) => storage.set(key, value)
 
-  const set = (value: Store[K]) => storage.set(key, value).subscribe()
+  const remove = () => storage.remove(key)
 
-  return { value, set } as const
+  return { value, set, remove } as const
 }
