@@ -15,7 +15,7 @@ dist-ssr
 .env
 .env.*
 
-src/styles/*
+src/styles/app.css
 
 # Editor directories and files
 .vscode/*

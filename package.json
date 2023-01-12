@@ -16,9 +16,9 @@
   "scripts": {
     "dev": "vite",
     "preview": "vite preview",
-    "dev:styles": "tailwindcss --output src/styles/app.css --watch",
-    "build:styles": "tailwindcss --output src/styles/app.css --minify",
-    "build": "tailwindcss --minify --output src/styles/app.css && tsc && vite build",
+    "dev:styles": "tailwindcss --input src/styles/input.css --output src/styles/app.css --watch",
+    "build:styles": "tailwindcss --input src/styles/input.css --output src/styles/app.css --minify",
+    "build": "tailwindcss --input src/styles/input.css --minify --output src/styles/app.css && tsc && vite build",
     "format": "prettier --write ."
   },
   "dependencies": {
